@@ -13,6 +13,7 @@ namespace Core.Specifications
          // bool        -   This is the return type
          Expression<Func<T, bool>> Criteria { get; }        // Criteria is the WHERE e.g. where product id = 1
          List<Expression<Func<T, object>>> Includes { get; }
-         
+         Expression<Func<T, object>> OrderBy { get; }
+         Expression<Func<T, object>> OrderByDescending { get; }
     }
 }
