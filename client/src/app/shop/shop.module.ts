@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ShopComponent } from './shop.component';
 import { ProductItemComponent } from './product-item/product-item.component';
 import { SharedModule } from '../shared/share.module';
+import { PagingHeaderComponent } from '../shared/components/paging-header/paging-header.component';
 
 
 @NgModule({
@@ -12,7 +13,8 @@ import { SharedModule } from '../shared/share.module';
     SharedModule
   ],
   exports: [
-    ShopComponent
+    ShopComponent,
+    PagingHeaderComponent
   ]
 })
 export class ShopModule { }
