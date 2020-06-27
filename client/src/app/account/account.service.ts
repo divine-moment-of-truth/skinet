@@ -3,7 +3,7 @@ import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { IUser } from '../shared/models/user';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of, ReplaySubject } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -11,16 +11,18 @@ import { Router } from '@angular/router';
 })
 export class AccountService {
   baseUrl = environment.apiUrl;
-  private currentUserSource = new BehaviorSubject<IUser>(null);
+  private currentUserSource = new ReplaySubject<IUser>(null);
   currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  getCurrentUserValue() {
-    return this.currentUserSource.value;
-  }
-
   loadCurrentUser(token: string) {
+    // if user is not logged in
+    if (token === null) {
+      this.currentUserSource.next(null);
+      return of(null);
+    }
+
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', `Bearer ${token}`);
 
@@ -34,8 +36,8 @@ export class AccountService {
     );
   }
 
-  login(value: any) {
-    return this.http.post(this.baseUrl + 'account/login', value).pipe(
+  login(values: any) {
+    return this.http.post(this.baseUrl + 'account/login', values).pipe(
       map((user: IUser) => {
         if (user) {
           localStorage.setItem('token', user.token);
@@ -50,6 +52,7 @@ export class AccountService {
       map((user: IUser) => {
         if (user) {
           localStorage.setItem('token', user.token);
+          this.currentUserSource.next(user);
         }
       })
     );
@@ -61,7 +64,7 @@ export class AccountService {
     this.router.navigateByUrl('/');
   }
 
-  checkEailExists(email: string) {
-    return this.http.get(this.baseUrl + '/account/emailexists?email=' + email);
+  checkEmailExists(email: string) {
+    return this.http.get(this.baseUrl + 'account/emailexists?email=' + email);
   }
 }
